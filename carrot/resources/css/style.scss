@@ -66,10 +66,12 @@ button {
 
         img {
             position: absolute;
+            cursor: pointer;
         }
     }
 
     &_result {
+        visibility: hidden;
         position: absolute;
         left: 50%;
         bottom: 50px;

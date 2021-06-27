@@ -16,8 +16,8 @@ button { background-color: transparent; border: none; outline: none; cursor: poi
 
 .game_area { position: absolute; left: 0; bottom: 0; width: 100%; height: 300px; }
 
-.game_area img { position: absolute; }
+.game_area img { position: absolute; cursor: pointer; }
 
-.game_result { position: absolute; left: 50%; bottom: 50px; width: 400px; height: 200px; padding-top: 30px; margin-left: -200px; background-color: rgba(0, 0, 0, 0.5); border-radius: 30px; }
+.game_result { visibility: hidden; position: absolute; left: 50%; bottom: 50px; width: 400px; height: 200px; padding-top: 30px; margin-left: -200px; background-color: rgba(0, 0, 0, 0.5); border-radius: 30px; }
 
 .game_result_txt { margin-top: 20px; font-weight: bold; font-size: 40px; color: #fff; }
