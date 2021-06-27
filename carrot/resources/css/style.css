@@ -1,1 +1,23 @@
-/* No CSS */
+* { -webkit-box-sizing: border-box; box-sizing: border-box; }
+
+body { background-color: #000; }
+
+button { background-color: transparent; border: none; outline: none; cursor: pointer; }
+
+.game { position: relative; width: 700px; height: 500px; margin: 100px auto 0; background: url(../img/background.png) 0 0 no-repeat; background-size: cover; border-radius: 30px; text-align: center; }
+
+.game button { width: 50px; height: 50px; background-color: #fff; border: 2px solid #000; border-radius: 10px; font-size: 20px; }
+
+.game_top { display: inline-block; margin-top: 20px; }
+
+.game_timer { width: 100px; padding: 10px; margin: 10px auto; border: 2px solid #000; font-size: 20px; background-color: #fff; }
+
+.game_score { display: inline-block; width: 50px; height: 50px; background-color: coral; border-radius: 100%; font-size: 20px; color: #fff; line-height: 50px; }
+
+.game_area { position: absolute; left: 0; bottom: 0; width: 100%; height: 300px; }
+
+.game_area img { position: absolute; }
+
+.game_result { position: absolute; left: 50%; bottom: 50px; width: 400px; height: 200px; padding-top: 30px; margin-left: -200px; background-color: rgba(0, 0, 0, 0.5); border-radius: 30px; }
+
+.game_result_txt { margin-top: 20px; font-weight: bold; font-size: 40px; color: #fff; }
