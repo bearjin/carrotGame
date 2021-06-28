@@ -7,26 +7,38 @@ class gameSetting {
     constructor(targetNum, gameTime) {
         this.$playBtn = document.querySelector('.play_btn');
         this.$replayBtn = document.querySelector('.replay_btn');
+        this.$score = document.querySelector('.game_score');
         this.$area = document.querySelector('.game_area');
         this.$result = document.querySelector('.game_result');
         this.$resultTxt = document.querySelector('.game_result_txt');
+        this.$minTxt = document.querySelector('.timer_min');
+        this.$secTxt = document.querySelector('.timer_sec');
         this.targetNum = targetNum;
         this.gameTime = gameTime;
+        this.currentTime = gameTime;
         this.timerInterval;
         this.score;
 
-        this.init();
+        this.onEvent();
     }
 
     /**
-     * 게임 초기 설정하기 :: 이벤트 등록
+     * 게임 이벤트 등록
      */
-    init() {
-        this.$playBtn.addEventListener('click', () => {
-            this.playGame();
+    onEvent() {
+        this.$playBtn.addEventListener('click', event => {
+            const state = event.target.dataset.state;
+
+            if (state === 'start') {
+                this.pauseGame();
+            } else if (state === 'pause') {
+                this.reStartGame();
+            } else if (state === 'init') {
+                this.playGame();
+            }
         });
         this.$replayBtn.addEventListener('click', () => {
-            this.playGame();
+            this.initGame();
         });
         this.$area.addEventListener('click', event => {
             const $target = event.target;
@@ -39,6 +51,21 @@ class gameSetting {
     }
 
     /**
+     * 게임 재설정
+     */
+    initGame() {
+        clearInterval(this.timerInterval);
+        this.$result.style.visibility = 'hidden';
+        this.$minTxt.innerText = '00';
+        this.$secTxt.innerText = '00';
+        this.$score.innerText = 0;
+        this.currentTime = this.gameTime;
+        this.$area.innerHTML = '';
+        this.$playBtn.classList.remove('fa-stop');
+        this.$playBtn.setAttribute('data-state', 'init');
+    }
+
+    /**
      * 게임 시작하기
      */
     playGame() {
@@ -46,24 +73,23 @@ class gameSetting {
         this.makeTarget();
         this.checkScore();
         this.$result.style.visibility = 'hidden';
+        this.$playBtn.classList.add('fa-stop');
+        this.$playBtn.setAttribute('data-state', 'start');
     }
 
     /**
      * 타이머 시작하기
      */
     startTimer() {
-        const $minTxt = document.querySelector('.timer_min');
-        const $secTxt = document.querySelector('.timer_sec');
         let time = this.gameTime;
         let min = parseInt(time / 60);
         let sec = time % 60;
-        min < 10 ? $minTxt.innerText = `0${min}` : $minTxt.innerText = `${min}`;
-        sec < 10 ? $secTxt.innerText = `0${sec}` : $secTxt.innerText = `${sec}`;
+        min < 10 ? this.$minTxt.innerText = `0${min}` : this.$minTxt.innerText = `${min}`;
+        sec < 10 ? this.$secTxt.innerText = `0${sec}` : this.$secTxt.innerText = `${sec}`;
 
         clearInterval(this.timerInterval);
         this.timerInterval = setInterval(() => {
-            time--;
-            console.log(time);
+            this.currentTime = time--;
             if (time < 0) {
                 clearInterval(this.timerInterval);
                 this.failGame();
@@ -71,8 +97,8 @@ class gameSetting {
             }
             min = parseInt(time / 60);
             sec = time % 60;
-            min < 10 ? $minTxt.innerText = `0${min}` : $minTxt.innerText = `${min}`;
-            sec < 10 ? $secTxt.innerText = `0${sec}` : $secTxt.innerText = `${sec}`;
+            min < 10 ? this.$minTxt.innerText = `0${min}` : this.$minTxt.innerText = `${min}`;
+            sec < 10 ? this.$secTxt.innerText = `0${sec}` : this.$secTxt.innerText = `${sec}`;
         }, 1000);
     }
 
@@ -80,12 +106,11 @@ class gameSetting {
      * 스코어 체크하기
      */
     checkScore() {
-        const $score = document.querySelector('.game_score');
         const $target = document.querySelectorAll('.carrot');
         const targetNum = $target.length;
 
         this.score = targetNum;
-        $score.innerText = targetNum;
+        this.$score.innerText = targetNum;
     }
 
     /**
@@ -133,6 +158,8 @@ class gameSetting {
             <i class="fas fa-laugh-squint"></i>
         `;
         this.$result.style.visibility = 'visible';
+        this.$playBtn.classList.remove('fa-stop');
+        this.$playBtn.setAttribute('data-state', 'init');
     }
 
     /**
@@ -145,6 +172,48 @@ class gameSetting {
             <i class="fas fa-sad-tear"></i>
         `;
         this.$result.style.visibility = 'visible';
+        this.$playBtn.classList.remove('fa-stop');
+        this.$playBtn.setAttribute('data-state', 'init');
+    }
+
+    /**
+     * 게임 일시정지
+     */
+    pauseGame() {
+        clearInterval(this.timerInterval);
+        this.$resultTxt.innerHTML = `
+        <span class="result_txt">RESTART?</span>
+        <i class="fas fa-surprise"></i>
+        `;
+        this.$result.style.visibility = 'visible';
+        this.$playBtn.classList.remove('fa-stop');
+        this.$playBtn.setAttribute('data-state', 'pause');
+    }
+
+    /**
+     * 게임 재시작
+     */
+    reStartGame() {
+        this.$result.style.visibility = 'hidden';
+        this.$playBtn.classList.add('fa-stop');
+        this.$playBtn.setAttribute('data-state', 'start');
+
+        let time = this.currentTime;
+        let min = parseInt(time / 60);
+        let sec = time % 60;
+
+        this.timerInterval = setInterval(() => {
+            this.currentTime = time--;
+            if (time < 0) {
+                clearInterval(this.timerInterval);
+                this.failGame();
+                return;
+            }
+            min = parseInt(time / 60);
+            sec = time % 60;
+            min < 10 ? this.$minTxt.innerText = `0${min}` : this.$minTxt.innerText = `${min}`;
+            sec < 10 ? this.$secTxt.innerText = `0${sec}` : this.$secTxt.innerText = `${sec}`;
+        }, 1000);
     }
 }
 
