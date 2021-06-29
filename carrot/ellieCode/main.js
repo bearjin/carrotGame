@@ -1,14 +1,56 @@
 'use strick';
 
+const CARROT_SIZE = 80;
+const CARROT_COUNT = 5;
+const BUG_COUNT = 5;
+
 const field = document.querySelector('.game_field');
 const fieldRect = field.getBoundingClientRect();
-const CARROT_SIZE = 80;
+const gameBtn = document.querySelector('.game_button');
+const gameTimer = document.querySelector('.game_timer');
+const gameScore = document.querySelector('.game_score');
+
+let started = false;
+let score = 0;
+let timer = undefined;
+
+gameBtn.addEventListener('click', () => {
+    if (started) {
+        stopGame();
+    } else {
+        startGame();
+    }
+    started = !started;
+});
+
+function startGame() {
+    initGame();
+    showStopButton();
+    showTimerAndScore();
+}
+
+function stopGame() {
+
+}
+
+function showStopButton() {
+    const icon = gameBtn.querySelector('.fa-play');
+    icon.classList.add('fa-stop');
+    icon.classList.remove('fa-play');
+}
+
+function showTimerAndScore() {
+    gameTimer.style.visibility = 'visible';
+    gameScore.style.visibility = 'visible';
+}
 
 function initGame() {
+    field.innerHTML = '';
+    gameScore.innerText = CARROT_COUNT;
+
     // 벌레와 당근을 생성한뒤 field에 추가해줌
-    console.log(fieldRect);
-    addItem('carrot', 5, '../resources/img/carrot.png');
-    addItem('bug', 5, '../resources/img/bug.png');
+    addItem('carrot', CARROT_COUNT, '../resources/img/carrot.png');
+    addItem('bug', BUG_COUNT, '../resources/img/bug.png');
 }
 
 function addItem(className, count, imgPath) {
@@ -33,5 +75,3 @@ function addItem(className, count, imgPath) {
         return Math.random() * (max - min) + min;
     }
 }
-
-initGame();
