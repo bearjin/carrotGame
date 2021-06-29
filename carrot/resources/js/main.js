@@ -18,6 +18,10 @@ class gameSetting {
         this.currentTime = gameTime;
         this.timerInterval;
         this.score;
+        this.bgAudio = new Audio('./resources/sound/bg.mp3');
+        this.winAudio = new Audio('./resources/sound/game_win.mp3');
+        this.carrotAudio = new Audio('./resources/sound/carrot_pull.mp3');
+        this.bugAudio = new Audio('./resources/sound/bug_pull.mp3');
 
         this.onEvent();
     }
@@ -31,10 +35,13 @@ class gameSetting {
 
             if (state === 'start') {
                 this.pauseGame();
+                this.bgAudio.pause();
             } else if (state === 'pause') {
                 this.reStartGame();
+                this.bgAudio.play();
             } else if (state === 'init') {
                 this.playGame();
+                this.bgAudio.play();
             }
         });
         this.$replayBtn.addEventListener('click', () => {
@@ -42,10 +49,18 @@ class gameSetting {
         });
         this.$area.addEventListener('click', event => {
             const $target = event.target;
+            if ($target.className === 'bug') {
+                this.bugAudio.play();
+                this.failGame();
+            } else if ($target.className === 'carrot') {
+                this.carrotAudio.play();
+            }
             this.removeTarget($target);
             this.checkScore();
             if (this.score === 0) {
                 this.successGame();
+                this.bgAudio.pause();
+                this.winAudio.play();
             }
         });
     }
@@ -93,6 +108,7 @@ class gameSetting {
             if (time < 0) {
                 clearInterval(this.timerInterval);
                 this.failGame();
+                this.bgAudio.pause();
                 return;
             }
             min = parseInt(time / 60);
@@ -174,6 +190,7 @@ class gameSetting {
         this.$result.style.visibility = 'visible';
         this.$playBtn.classList.remove('fa-stop');
         this.$playBtn.setAttribute('data-state', 'init');
+        this.bgAudio.pause();
     }
 
     /**
