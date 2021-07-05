@@ -1,6 +1,6 @@
 'use strict';
 
-import * as sound from './sound.js';
+import * as Sound from './sound.js';
 
 const CARROT_SIZE = 80;
 
@@ -49,7 +49,7 @@ export default class Field {
         const target = event.target;
         if (target.matches('.carrot')) {
             target.remove();
-            sound.playCarrot();
+            Sound.playCarrot();
             this.onItemClick && this.onItemClick('carrot');
         } else if (target.matches('.bug')) {
             this.onItemClick && this.onItemClick('bug');
