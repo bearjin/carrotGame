@@ -1,3 +1,12 @@
+'use strict';
+
+import Popup from './popup.js';
+
+const gameFinishBanner = new Popup();
+gameFinishBanner.setClickListener(() => {
+    carrotGame.initGame();
+});
+
 class gameSetting {
     /**
      * 
@@ -6,11 +15,8 @@ class gameSetting {
      */
     constructor(targetNum, gameTime) {
         this.$playBtn = document.querySelector('.play_btn');
-        this.$replayBtn = document.querySelector('.replay_btn');
         this.$score = document.querySelector('.game_score');
         this.$area = document.querySelector('.game_area');
-        this.$result = document.querySelector('.game_result');
-        this.$resultTxt = document.querySelector('.game_result_txt');
         this.$minTxt = document.querySelector('.timer_min');
         this.$secTxt = document.querySelector('.timer_sec');
         this.targetNum = targetNum;
@@ -38,10 +44,6 @@ class gameSetting {
                 this.playGame();
                 this.playSound(this.bgAudio);
             }
-        });
-
-        this.$replayBtn.addEventListener('click', () => {
-            this.initGame();
         });
 
         this.$area.addEventListener('click', event => {
@@ -78,7 +80,7 @@ class gameSetting {
      */
     initGame() {
         this.stopTimer();
-        this.hidePopUp();
+        gameFinishBanner.hidePopUp();
         this.resetSetting();
         this.changeButton('init');
     }
@@ -90,7 +92,7 @@ class gameSetting {
         this.startTimer();
         this.makeTarget();
         this.checkScore();
-        this.hidePopUp();
+        gameFinishBanner.hidePopUp();
         this.changeButton('start');
     }
 
@@ -100,7 +102,7 @@ class gameSetting {
     successGame() {
         this.stopTimer();
         this.changeButton('init');
-        this.showPopUp("YOU WIN", "fa-laugh-squint");
+        gameFinishBanner.showPopUp("YOU WIN", "fa-laugh-squint");
     }
 
     /**
@@ -110,7 +112,7 @@ class gameSetting {
         this.stopSound(this.bgAudio);
         this.stopTimer();
         this.changeButton('init');
-        this.showPopUp("YOU LOSE", "fa-sad-tear");
+        gameFinishBanner.showPopUp("YOU LOSE", "fa-sad-tear");
     }
 
     /**
@@ -119,7 +121,7 @@ class gameSetting {
     pauseGame() {
         this.stopTimer();
         this.changeButton('pause');
-        this.showPopUp("RESTART?", "fa-surprise");
+        gameFinishBanner.showPopUp("RESTART?", "fa-surprise");
     }
 
     /**
@@ -128,7 +130,7 @@ class gameSetting {
     reStartGame() {
         this.startTimer();
         this.changeButton('start');
-        this.hidePopUp();
+        gameFinishBanner.hidePopUp();
     }
 
     /**
@@ -223,26 +225,6 @@ class gameSetting {
         if (target.className === 'carrot') {
             this.$area.removeChild(target);
         }
-    }
-
-    /**
-     * 팝업 쇼
-     * @param {string} text 팝업 문구
-     * @param {string} icon 아이콘 클래스 
-     */
-    showPopUp(text, icon) {
-        this.$resultTxt.innerHTML = `
-            <span class="result_txt">${text}</span>
-            <i class="fas ${icon}"></i>
-        `;
-        this.$result.style.visibility = 'visible';
-    }
-
-    /**
-     * 팝업 히든
-     */
-    hidePopUp() {
-        this.$result.style.visibility = 'hidden';
     }
 
     /**
