@@ -8,6 +8,7 @@ export default class Popup {
 
         this.$replayBtn.addEventListener('click', () => {
             this.onClick && this.onClick();
+            this.hidePopUp();
         });
     }
 
