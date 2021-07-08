@@ -1,10 +1,23 @@
 'use strict';
 
 import Popup from './popup.js';
+import Field from './field.js';
+import * as sound from './sound.js';
 
 const gameFinishBanner = new Popup();
 gameFinishBanner.setClickListener(() => {
     carrotGame.initGame();
+});
+
+const gameField = new Field(10);
+gameField.setClickListener(item => {
+    if (item === 'carrot') {
+        sound.playCarrot();
+    } else if (item === 'bug') {
+        sound.playBug();
+        carrotGame.failGame();
+    }
+    carrotGame.checkScore();
 });
 
 class gameSetting {
@@ -13,53 +26,28 @@ class gameSetting {
      * @param {string} targetNum 생성 할 타겟 수 
      * @param {string} gameTime  게임 제한시간
      */
-    constructor(targetNum, gameTime) {
+    constructor(gameTime) {
         this.$playBtn = document.querySelector('.play_btn');
         this.$score = document.querySelector('.game_score');
-        this.$area = document.querySelector('.game_area');
         this.$minTxt = document.querySelector('.timer_min');
         this.$secTxt = document.querySelector('.timer_sec');
-        this.targetNum = targetNum;
         this.gameTime = gameTime;
         this.currentTime = gameTime;
         this.timerInterval;
         this.score;
-        this.targetSize = 80;
-        this.bgAudio = new Audio('./resources/sound/bg.mp3');
-        this.winAudio = new Audio('./resources/sound/game_win.mp3');
-        this.carrotAudio = new Audio('./resources/sound/carrot_pull.mp3');
-        this.bugAudio = new Audio('./resources/sound/bug_pull.mp3');
-        this.alertAudio = new Audio('./resources/sound/alert.wav');
 
         this.$playBtn.addEventListener('click', event => {
             const state = event.target.dataset.state;
 
             if (state === 'start') {
                 this.pauseGame();
-                this.stopSound(this.bgAudio);
+                sound.playBackground();
             } else if (state === 'pause') {
                 this.reStartGame();
-                this.playSound(this.bgAudio);
+                sound.playBackground();
             } else if (state === 'init') {
                 this.playGame();
-                this.playSound(this.bgAudio);
-            }
-        });
-
-        this.$area.addEventListener('click', event => {
-            const $target = event.target;
-            if ($target.className === 'bug') {
-                this.playSound(this.bugAudio);
-                this.failGame();
-            } else if ($target.className === 'carrot') {
-                this.playSound(this.carrotAudio);
-            }
-            this.removeTarget($target);
-            this.checkScore();
-            if (this.score === 0) {
-                this.successGame();
-                this.stopSound(this.bgAudio);
-                this.playSound(this.winAudio);
+                sound.playBackground();
             }
         });
     }
@@ -72,7 +60,7 @@ class gameSetting {
         this.$secTxt.innerText = '00';
         this.$score.innerText = 0;
         this.currentTime = this.gameTime;
-        this.$area.innerHTML = '';
+        gameField.$area.innerHTML = '';
     }
 
     /**
@@ -90,7 +78,7 @@ class gameSetting {
      */
     playGame() {
         this.startTimer();
-        this.makeTarget();
+        gameField.makeTarget();
         this.checkScore();
         gameFinishBanner.hidePopUp();
         this.changeButton('start');
@@ -109,7 +97,7 @@ class gameSetting {
      * 게임 실패
      */
     failGame() {
-        this.stopSound(this.bgAudio);
+        sound.stopBackground();
         this.stopTimer();
         this.changeButton('init');
         gameFinishBanner.showPopUp("YOU LOSE", "fa-sad-tear");
@@ -150,16 +138,17 @@ class gameSetting {
      * 타이머 시작하기
      */
     startTimer() {
-        let time = this.gameTime;
+        let time = this.currentTime;
         this.updateTimerText(time);
         this.timerInterval = setInterval(() => {
             if (time <= 0) {
                 this.stopTimer();
                 this.failGame();
-                this.stopSound(this.bgAudio);
+                sound.stopBackground();
                 return;
             }
             this.updateTimerText(--time);
+            this.currentTime = time;
         }, 1000);
     }
 
@@ -190,59 +179,13 @@ class gameSetting {
 
         this.score = targetNum;
         this.$score.innerText = targetNum;
-    }
 
-    /**
-     * 타겟 생성하기
-     */
-    makeTarget() {
-        const areaSize = this.$area.getBoundingClientRect();
-        let img = "";
-
-        for (let i = 0; i < this.targetNum; i++) {
-            const randomNum = Math.floor(Math.random() * 2);
-            const randomPositionX = Math.floor(Math.random() * (areaSize.width - this.targetSize));
-            const randomPositionY = Math.floor(Math.random() * (areaSize.height - this.targetSize));
-
-            if (randomNum === 0) {
-                img += `
-                    <img class="bug" src="./resources/img/bug.png" alt="벌레" style="left: ${randomPositionX}px; top:${randomPositionY}px;">
-                `;
-            } else {
-                img += `
-                    <img class="carrot" src="./resources/img/carrot.png" alt="당근" style="left: ${randomPositionX}px; top: ${randomPositionY}px;">
-                `;
-            }
+        if (this.score === 0) {
+            this.successGame();
+            sound.stopBackground();
+            sound.playWin();
         }
-        this.$area.innerHTML = img;
-    }
-
-    /**
-     * 타겟 제거하기
-     * @param {element} target 타겟
-     */
-    removeTarget(target) {
-        if (target.className === 'carrot') {
-            this.$area.removeChild(target);
-        }
-    }
-
-    /**
-     * 사운드 시작
-     * @param {element} sound 플레이할 사운드
-     */
-    playSound(sound) {
-        sound.currentTime = 0;
-        sound.play();
-    }
-
-    /**
-     * 사운드 멈춤
-     * @param {element} sound 플레이할 사운드
-     */
-    stopSound(sound) {
-        sound.pause();
     }
 }
 
-const carrotGame = new gameSetting(10, 10);
+const carrotGame = new gameSetting(10);
